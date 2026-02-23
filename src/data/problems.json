@@ -1,0 +1,89 @@
+[
+  {
+    "id": 1,
+    "day": 1,
+    "title": "Two Sum",
+    "difficulty": "Easy",
+    "tags": ["Array", "Hash Map"],
+    "solved": true,
+    "question": "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.",
+    "examples": [
+      { "input": "nums = [2,7,11,15], target = 9", "output": "[0, 1]", "explanation": "nums[0] + nums[1] = 2 + 7 = 9" },
+      { "input": "nums = [3,2,4], target = 6",     "output": "[1, 2]", "explanation": "nums[1] + nums[2] = 2 + 4 = 6" }
+    ],
+    "steps": [
+      { "step": 1, "title": "Brute force first",            "detail": "Try every pair (i,j) and check nums[i]+nums[j]==target. O(n²) — too slow, but good for understanding." },
+      { "step": 2, "title": "What are we searching for?",   "detail": "For each number, we need target - num. If we can look that up in O(1), we're done." },
+      { "step": 3, "title": "Hash map on the fly",          "detail": "Iterate and store each number→index. Before storing, check if complement already exists." },
+      { "step": 4, "title": "Return early",                 "detail": "The moment complement is found, return [seen[complement], i]. Guaranteed one solution exists." }
+    ],
+    "code": "def two_sum(nums, target):\n    seen = {}\n    for i, num in enumerate(nums):\n        complement = target - num\n        if complement in seen:\n            return [seen[complement], i]\n        seen[num] = i\n    return []\n\nprint(two_sum([2, 7, 11, 15], 9))\nprint(two_sum([3, 2, 4], 6))\nprint(two_sum([3, 3], 6))",
+    "complexity": { "time": "O(n)", "space": "O(n)" },
+    "notes": "Classic hash map pattern. Key insight: instead of searching for a pair, search for a single complement.\n\nGotcha: check complement BEFORE storing num — otherwise target=6, nums=[3,3] would fail.\n\nThis pattern repeats everywhere — always ask 'what am I searching for?'"
+  },
+  {
+    "id": 2,
+    "day": 2,
+    "title": "Valid Parentheses",
+    "difficulty": "Easy",
+    "tags": ["Stack", "String"],
+    "solved": true,
+    "question": "Given a string containing just '(', ')', '{', '}', '[' and ']', determine if the input string is valid.\n\nBrackets must be closed in the correct order, and every closing bracket must match its corresponding opening bracket.",
+    "examples": [
+      { "input": "s = \"()[]{}\"", "output": "True",  "explanation": "All brackets properly opened and closed." },
+      { "input": "s = \"([)]\"",   "output": "False", "explanation": "Brackets interleaved incorrectly." }
+    ],
+    "steps": [
+      { "step": 1, "title": "Recognize LIFO",              "detail": "The last opened bracket must close first. That's a stack." },
+      { "step": 2, "title": "Build closing → opening map", "detail": "{ ')':'(', '}':'{', ']':'[' } tells us what each closing bracket expects." },
+      { "step": 3, "title": "Process each character",      "detail": "Opening → push. Closing → pop and verify match. Empty stack on close → False." },
+      { "step": 4, "title": "Final check",                 "detail": "Stack must be empty at end. Non-empty means unclosed brackets." }
+    ],
+    "code": "def is_valid(s):\n    stack = []\n    closing = {')': '(', '}': '{', ']': '['}\n    for char in s:\n        if char in closing:\n            top = stack.pop() if stack else '#'\n            if closing[char] != top:\n                return False\n        else:\n            stack.append(char)\n    return len(stack) == 0\n\nprint(is_valid(\"()[]{}\"))\nprint(is_valid(\"([)]\"))\nprint(is_valid(\"{[]}\"))",
+    "complexity": { "time": "O(n)", "space": "O(n)" },
+    "notes": "The '#' sentinel avoids a separate empty-stack check — any non-matching char fails the comparison.\n\nPattern to remember: order + nesting constraints → stack."
+  },
+  {
+    "id": 3,
+    "day": 3,
+    "title": "Best Time to Buy & Sell Stock",
+    "difficulty": "Easy",
+    "tags": ["Array", "Greedy"],
+    "solved": false,
+    "question": "You are given an array prices where prices[i] is the price of a stock on day i.\n\nReturn the maximum profit from choosing one day to buy and a later day to sell. If no profit is possible, return 0.",
+    "examples": [
+      { "input": "prices = [7,1,5,3,6,4]", "output": "5", "explanation": "Buy day 2 (price=1), sell day 5 (price=6)." },
+      { "input": "prices = [7,6,4,3,1]",   "output": "0", "explanation": "No profitable transaction possible." }
+    ],
+    "steps": [
+      { "step": 1, "title": "Brute force O(n²)",           "detail": "Try all buy/sell pairs. Too slow for large inputs." },
+      { "step": 2, "title": "Track minimum price so far",  "detail": "When selling at day i, best buy is the lowest price seen before i." },
+      { "step": 3, "title": "Compute profit at each day",  "detail": "profit = price - min_price. Update max_profit if better. Update min_price." },
+      { "step": 4, "title": "Handle no-profit case",       "detail": "Init max_profit = 0. If prices only fall, it stays 0." }
+    ],
+    "code": "def max_profit(prices):\n    min_price = float('inf')\n    max_profit = 0\n    for price in prices:\n        if price < min_price:\n            min_price = price\n        elif price - min_price > max_profit:\n            max_profit = price - min_price\n    return max_profit\n\nprint(max_profit([7, 1, 5, 3, 6, 4]))\nprint(max_profit([7, 6, 4, 3, 1]))\nprint(max_profit([1, 2]))",
+    "complexity": { "time": "O(n)", "space": "O(1)" },
+    "notes": "O(1) space is the real win — just two variables.\n\nAlso called 'sliding window minimum'. Recognise this for harder stock problems — multiple transactions, cooldown, fees.\n\nNot yet solved — review tomorrow."
+  },
+  {
+    "id": 4,
+    "day": 4,
+    "title": "Contains Duplicate",
+    "difficulty": "Easy",
+    "tags": ["Array", "Hash Set"],
+    "solved": false,
+    "question": "Given an integer array nums, return true if any value appears at least twice, and false if every element is distinct.",
+    "examples": [
+      { "input": "nums = [1,2,3,1]", "output": "True",  "explanation": "1 appears at index 0 and 3." },
+      { "input": "nums = [1,2,3,4]", "output": "False", "explanation": "All elements distinct." }
+    ],
+    "steps": [
+      { "step": 1, "title": "Naive: sort first",    "detail": "Sort the array — duplicates become adjacent. Check nums[i]==nums[i+1]. O(n log n)." },
+      { "step": 2, "title": "Better: use a set",    "detail": "A set only stores unique values. If we encounter a value already in the set, we found a duplicate." },
+      { "step": 3, "title": "Return early",         "detail": "Return True the moment a duplicate is found. No need to scan the whole array." }
+    ],
+    "code": "def contains_duplicate(nums):\n    seen = set()\n    for num in nums:\n        if num in seen:\n            return True\n        seen.add(num)\n    return False\n\n# One-liner: return len(nums) != len(set(nums))\n\nprint(contains_duplicate([1, 2, 3, 1]))\nprint(contains_duplicate([1, 2, 3, 4]))",
+    "complexity": { "time": "O(n)", "space": "O(n)" },
+    "notes": "The one-liner len(nums) != len(set(nums)) is elegant but always scans everything. The explicit loop returns early — better for large arrays with early duplicates."
+  }
+]
