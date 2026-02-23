@@ -1,89 +1,66 @@
 [
   {
-    "id": 1,
-    "day": 1,
-    "title": "Two Sum",
-    "difficulty": "Easy",
-    "tags": ["Array", "Hash Map"],
-    "solved": true,
-    "question": "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.",
-    "examples": [
-      { "input": "nums = [2,7,11,15], target = 9", "output": "[0, 1]", "explanation": "nums[0] + nums[1] = 2 + 7 = 9" },
-      { "input": "nums = [3,2,4], target = 6",     "output": "[1, 2]", "explanation": "nums[1] + nums[2] = 2 + 4 = 6" }
-    ],
-    "steps": [
-      { "step": 1, "title": "Brute force first",            "detail": "Try every pair (i,j) and check nums[i]+nums[j]==target. O(n²) — too slow, but good for understanding." },
-      { "step": 2, "title": "What are we searching for?",   "detail": "For each number, we need target - num. If we can look that up in O(1), we're done." },
-      { "step": 3, "title": "Hash map on the fly",          "detail": "Iterate and store each number→index. Before storing, check if complement already exists." },
-      { "step": 4, "title": "Return early",                 "detail": "The moment complement is found, return [seen[complement], i]. Guaranteed one solution exists." }
-    ],
-    "code": "def two_sum(nums, target):\n    seen = {}\n    for i, num in enumerate(nums):\n        complement = target - num\n        if complement in seen:\n            return [seen[complement], i]\n        seen[num] = i\n    return []\n\nprint(two_sum([2, 7, 11, 15], 9))\nprint(two_sum([3, 2, 4], 6))\nprint(two_sum([3, 3], 6))",
-    "complexity": { "time": "O(n)", "space": "O(n)" },
-    "notes": "Classic hash map pattern. Key insight: instead of searching for a pair, search for a single complement.\n\nGotcha: check complement BEFORE storing num — otherwise target=6, nums=[3,3] would fail.\n\nThis pattern repeats everywhere — always ask 'what am I searching for?'"
+  "id": 1,
+  "day": 1,
+  "title": "Missing Number in 1 to n",
+  "difficulty": "Easy",
+  "tags": ["Array", "Math", "Bit Manipulation"],
+  "solved": true,
+  "question": "You are given an array arr[] of size n - 1 that contains distinct integers in the range from 1 to n (inclusive). This array represents a permutation of the integers from 1 to n with one element missing. Your task is to identify and return the missing element.",
+  "examples": [
+    { 
+      "input": "arr[] = [1, 2, 3, 5]", 
+      "output": "4", 
+      "explanation": "All the numbers from 1 to 5 are present except 4." 
+    },
+    { 
+      "input": "arr[] = [8, 2, 4, 5, 3, 7, 1]", 
+      "output": "6", 
+      "explanation": "All the numbers from 1 to 8 are present except 6." 
+    },
+    { 
+      "input": "arr[] = [1]", 
+      "output": "2", 
+      "explanation": "Only 1 is present so the missing element is 2." 
+    }
+  ],
+  "constraints": {
+    "arr.size()": "1 ≤ arr.size() ≤ 10^6",
+    "arr[i]": "1 ≤ arr[i] ≤ arr.size() + 1"
   },
-  {
-    "id": 2,
-    "day": 2,
-    "title": "Valid Parentheses",
-    "difficulty": "Easy",
-    "tags": ["Stack", "String"],
-    "solved": true,
-    "question": "Given a string containing just '(', ')', '{', '}', '[' and ']', determine if the input string is valid.\n\nBrackets must be closed in the correct order, and every closing bracket must match its corresponding opening bracket.",
-    "examples": [
-      { "input": "s = \"()[]{}\"", "output": "True",  "explanation": "All brackets properly opened and closed." },
-      { "input": "s = \"([)]\"",   "output": "False", "explanation": "Brackets interleaved incorrectly." }
-    ],
-    "steps": [
-      { "step": 1, "title": "Recognize LIFO",              "detail": "The last opened bracket must close first. That's a stack." },
-      { "step": 2, "title": "Build closing → opening map", "detail": "{ ')':'(', '}':'{', ']':'[' } tells us what each closing bracket expects." },
-      { "step": 3, "title": "Process each character",      "detail": "Opening → push. Closing → pop and verify match. Empty stack on close → False." },
-      { "step": 4, "title": "Final check",                 "detail": "Stack must be empty at end. Non-empty means unclosed brackets." }
-    ],
-    "code": "def is_valid(s):\n    stack = []\n    closing = {')': '(', '}': '{', ']': '['}\n    for char in s:\n        if char in closing:\n            top = stack.pop() if stack else '#'\n            if closing[char] != top:\n                return False\n        else:\n            stack.append(char)\n    return len(stack) == 0\n\nprint(is_valid(\"()[]{}\"))\nprint(is_valid(\"([)]\"))\nprint(is_valid(\"{[]}\"))",
-    "complexity": { "time": "O(n)", "space": "O(n)" },
-    "notes": "The '#' sentinel avoids a separate empty-stack check — any non-matching char fails the comparison.\n\nPattern to remember: order + nesting constraints → stack."
+  "steps": [
+    { 
+      "step": 1, 
+      "title": "Brute force idea",            
+      "detail": "Check every number from 1 to n and see if it exists in the array. This takes O(n²) in worst case — too slow for n up to 10^6." 
+    },
+    { 
+      "step": 2, 
+      "title": "Use math formula",   
+      "detail": "Sum of first n natural numbers = n*(n+1)/2. Subtract the actual array sum from expected sum. The difference is the missing number." 
+    },
+    { 
+      "step": 3, 
+      "title": "Avoid overflow (optional)",          
+      "detail": "For very large n, use integer type that can handle large values (like Python int or long in Java/C++)." 
+    },
+    { 
+      "step": 4, 
+      "title": "Alternative: XOR trick",                 
+      "detail": "XOR all numbers from 1 to n and XOR all array elements. The final XOR gives the missing number. Useful when avoiding large sums." 
+    }
+  ],
+  "code": "def missing_number(arr):\n    n = len(arr) + 1\n    expected_sum = n * (n + 1) // 2\n    actual_sum = sum(arr)\n    return expected_sum - actual_sum\n\nprint(missing_number([1, 2, 3, 5]))\nprint(missing_number([8, 2, 4, 5, 3, 7, 1]))\nprint(missing_number([1]))",
+  "complexity": { 
+    "time": "O(n)", 
+    "space": "O(1)" 
   },
-  {
-    "id": 3,
-    "day": 3,
-    "title": "Best Time to Buy & Sell Stock",
-    "difficulty": "Easy",
-    "tags": ["Array", "Greedy"],
-    "solved": false,
-    "question": "You are given an array prices where prices[i] is the price of a stock on day i.\n\nReturn the maximum profit from choosing one day to buy and a later day to sell. If no profit is possible, return 0.",
-    "examples": [
-      { "input": "prices = [7,1,5,3,6,4]", "output": "5", "explanation": "Buy day 2 (price=1), sell day 5 (price=6)." },
-      { "input": "prices = [7,6,4,3,1]",   "output": "0", "explanation": "No profitable transaction possible." }
-    ],
-    "steps": [
-      { "step": 1, "title": "Brute force O(n²)",           "detail": "Try all buy/sell pairs. Too slow for large inputs." },
-      { "step": 2, "title": "Track minimum price so far",  "detail": "When selling at day i, best buy is the lowest price seen before i." },
-      { "step": 3, "title": "Compute profit at each day",  "detail": "profit = price - min_price. Update max_profit if better. Update min_price." },
-      { "step": 4, "title": "Handle no-profit case",       "detail": "Init max_profit = 0. If prices only fall, it stays 0." }
-    ],
-    "code": "def max_profit(prices):\n    min_price = float('inf')\n    max_profit = 0\n    for price in prices:\n        if price < min_price:\n            min_price = price\n        elif price - min_price > max_profit:\n            max_profit = price - min_price\n    return max_profit\n\nprint(max_profit([7, 1, 5, 3, 6, 4]))\nprint(max_profit([7, 6, 4, 3, 1]))\nprint(max_profit([1, 2]))",
-    "complexity": { "time": "O(n)", "space": "O(1)" },
-    "notes": "O(1) space is the real win — just two variables.\n\nAlso called 'sliding window minimum'. Recognise this for harder stock problems — multiple transactions, cooldown, fees.\n\nNot yet solved — review tomorrow."
-  },
-  {
-    "id": 4,
-    "day": 4,
-    "title": "Contains Duplicate",
-    "difficulty": "Easy",
-    "tags": ["Array", "Hash Set"],
-    "solved": false,
-    "question": "Given an integer array nums, return true if any value appears at least twice, and false if every element is distinct.",
-    "examples": [
-      { "input": "nums = [1,2,3,1]", "output": "True",  "explanation": "1 appears at index 0 and 3." },
-      { "input": "nums = [1,2,3,4]", "output": "False", "explanation": "All elements distinct." }
-    ],
-    "steps": [
-      { "step": 1, "title": "Naive: sort first",    "detail": "Sort the array — duplicates become adjacent. Check nums[i]==nums[i+1]. O(n log n)." },
-      { "step": 2, "title": "Better: use a set",    "detail": "A set only stores unique values. If we encounter a value already in the set, we found a duplicate." },
-      { "step": 3, "title": "Return early",         "detail": "Return True the moment a duplicate is found. No need to scan the whole array." }
-    ],
-    "code": "def contains_duplicate(nums):\n    seen = set()\n    for num in nums:\n        if num in seen:\n            return True\n        seen.add(num)\n    return False\n\n# One-liner: return len(nums) != len(set(nums))\n\nprint(contains_duplicate([1, 2, 3, 1]))\nprint(contains_duplicate([1, 2, 3, 4]))",
-    "complexity": { "time": "O(n)", "space": "O(n)" },
-    "notes": "The one-liner len(nums) != len(set(nums)) is elegant but always scans everything. The explicit loop returns early — better for large arrays with early duplicates."
-  }
+  "notes": "DETAILED CONCEPTUAL UNDERSTANDING:\n\n1. WHY DOES THIS WORK?\nWe are guaranteed that the numbers form a perfect sequence from 1 to n except one missing value. This means the problem has a mathematical structure, not a random array problem.\n\n2. CORE IDEA:\nInstead of searching for what is missing directly, compute what should exist in total, then compare with what actually exists.\n\n3. SUM METHOD EXPLANATION:\nThe formula n*(n+1)/2 gives the total sum of integers from 1 to n. This comes from pairing numbers:\n(1 + n), (2 + n-1), (3 + n-2) ... each pair equals (n+1).\nNumber of pairs = n/2.\nThus total = n*(n+1)/2.\n\nIf one number is missing:\nexpected_sum = sum(1..n)\nactual_sum = sum(arr)\nmissing = expected_sum - actual_sum\n\nExample:\narr = [1,2,3,5]\nn = 5\nexpected = 5*6/2 = 15\nactual = 11\nmissing = 15 - 11 = 4\n\n4. WHY NOT BRUTE FORCE?\nChecking each number using \"if i not in arr\" takes O(n) per check → total O(n^2). With n up to 10^6, that is too slow.\n\n5. OVERFLOW CONSIDERATION:\nIn languages like C++/Java, n*(n+1)/2 can overflow if using int. Use long/long long. Python handles big integers automatically.\n\n6. XOR METHOD DEEP UNDERSTANDING:\nXOR properties:\na ^ a = 0\n0 ^ a = a\nXOR is commutative and associative.\n\nIf we compute:\n(1 ^ 2 ^ 3 ^ ... ^ n) ^ (all elements of arr)\nAll common numbers cancel out, leaving only the missing one.\n\nExample:\nn=5\nFull XOR = 1^2^3^4^5\nArray XOR = 1^2^3^5\nFinal XOR = (1^2^3^4^5)^(1^2^3^5)\nEverything cancels except 4.\n\n7. WHICH METHOD TO CHOOSE?\n- Sum method → simplest and most readable.\n- XOR method → avoids overflow, common interview trick.\n\n8. PATTERN RECOGNITION:\nWhenever:\n- Numbers are 1 to n\n- Exactly one missing\n- No duplicates\nThink mathematical formula or XOR immediately.\n\nThis is a classic foundational array problem testing mathematical observation rather than data structure complexity."
+}
+
+
+
+
+
 ]
+
