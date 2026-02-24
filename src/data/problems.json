@@ -56,8 +56,65 @@
     "space": "O(1)" 
   },
   "notes": "DETAILED CONCEPTUAL UNDERSTANDING:\n\n1. WHY DOES THIS WORK?\nWe are guaranteed that the numbers form a perfect sequence from 1 to n except one missing value. This means the problem has a mathematical structure, not a random array problem.\n\n2. CORE IDEA:\nInstead of searching for what is missing directly, compute what should exist in total, then compare with what actually exists.\n\n3. SUM METHOD EXPLANATION:\nThe formula n*(n+1)/2 gives the total sum of integers from 1 to n. This comes from pairing numbers:\n(1 + n), (2 + n-1), (3 + n-2) ... each pair equals (n+1).\nNumber of pairs = n/2.\nThus total = n*(n+1)/2.\n\nIf one number is missing:\nexpected_sum = sum(1..n)\nactual_sum = sum(arr)\nmissing = expected_sum - actual_sum\n\nExample:\narr = [1,2,3,5]\nn = 5\nexpected = 5*6/2 = 15\nactual = 11\nmissing = 15 - 11 = 4\n\n4. WHY NOT BRUTE FORCE?\nChecking each number using \"if i not in arr\" takes O(n) per check → total O(n^2). With n up to 10^6, that is too slow.\n\n5. OVERFLOW CONSIDERATION:\nIn languages like C++/Java, n*(n+1)/2 can overflow if using int. Use long/long long. Python handles big integers automatically.\n\n6. XOR METHOD DEEP UNDERSTANDING:\nXOR properties:\na ^ a = 0\n0 ^ a = a\nXOR is commutative and associative.\n\nIf we compute:\n(1 ^ 2 ^ 3 ^ ... ^ n) ^ (all elements of arr)\nAll common numbers cancel out, leaving only the missing one.\n\nExample:\nn=5\nFull XOR = 1^2^3^4^5\nArray XOR = 1^2^3^5\nFinal XOR = (1^2^3^4^5)^(1^2^3^5)\nEverything cancels except 4.\n\n7. WHICH METHOD TO CHOOSE?\n- Sum method → simplest and most readable.\n- XOR method → avoids overflow, common interview trick.\n\n8. PATTERN RECOGNITION:\nWhenever:\n- Numbers are 1 to n\n- Exactly one missing\n- No duplicates\nThink mathematical formula or XOR immediately.\n\nThis is a classic foundational array problem testing mathematical observation rather than data structure complexity."
+},
+{
+  "id": 2,
+  "day": 2,
+  "title": "Second Largest Element",
+  "difficulty": "Easy",
+  "tags": ["Array", "Traversal"],
+  "solved": true,
+  "question": "Given an array of positive integers arr[], return the second largest element from the array. If the second largest element doesn't exist then return -1. Note: The second largest element should not be equal to the largest element.",
+  "examples": [
+    {
+      "input": "arr[] = [12, 35, 1, 10, 34, 1]",
+      "output": "34",
+      "explanation": "The largest element is 35 and the second largest distinct element is 34."
+    },
+    {
+      "input": "arr[] = [10, 5, 10]",
+      "output": "5",
+      "explanation": "The largest element is 10 and the second largest distinct element is 5."
+    },
+    {
+      "input": "arr[] = [10, 10, 10]",
+      "output": "-1",
+      "explanation": "All elements are equal. There is no second largest distinct element."
+    }
+  ],
+  "constraints": {
+    "arr.size()": "2 ≤ arr.size() ≤ 10^5",
+    "arr[i]": "1 ≤ arr[i] ≤ 10^5"
+  },
+  "steps": [
+    {
+      "step": 1,
+      "title": "Brute force idea",
+      "detail": "Sort the array in descending order and pick the second distinct element. Sorting takes O(n log n) time which is unnecessary for just finding the second largest."
+    },
+    {
+      "step": 2,
+      "title": "Better approach (Two variable tracking)",
+      "detail": "Traverse the array once and maintain two variables: largest and second_largest. Update them carefully while ensuring second_largest is strictly smaller than largest."
+    },
+    {
+      "step": 3,
+      "title": "Initialization logic",
+      "detail": "Initialize largest and second_largest to -1 (or negative infinity). While traversing: if current element > largest, update second_largest = largest and largest = current element. Else if current element > second_largest and current element != largest, update second_largest."
+    },
+    {
+      "step": 4,
+      "title": "Edge case handling",
+      "detail": "If after traversal second_largest remains -1, it means no distinct second largest exists."
+    }
+  ],
+  "code": "def second_largest(arr):\n    largest = -1\n    second_largest = -1\n    \n    for num in arr:\n        if num > largest:\n            second_largest = largest\n            largest = num\n        elif num > second_largest and num != largest:\n            second_largest = num\n    \n    return second_largest\n\nprint(second_largest([12, 35, 1, 10, 34, 1]))\nprint(second_largest([10, 5, 10]))\nprint(second_largest([10, 10, 10]))",
+  "complexity": {
+    "time": "O(n)",
+    "space": "O(1)"
+  },
+  "notes": "DETAILED CONCEPTUAL UNDERSTANDING:\n\n1. CORE REQUIREMENT:\nWe must find the second largest DISTINCT element. Duplicate values of the largest should not count.\n\n2. WHY NOT SORT?\nSorting changes the original structure and costs O(n log n). The problem can be solved in one pass using O(n).\n\n3. SINGLE PASS LOGIC:\nMaintain two variables:\n- largest → highest value seen so far\n- second_largest → second highest distinct value\n\nWhile iterating:\nCase 1: num > largest\n    second_largest becomes previous largest\n    largest becomes num\n\nCase 2: num < largest but num > second_largest\n    update second_largest\n\nCase 3: num == largest\n    ignore (since we need distinct value)\n\n4. WHY INITIALIZE WITH -1?\nGiven constraints say all numbers are positive (≥1). So -1 safely indicates 'not found'.\n\n5. EDGE CASES:\n- All elements equal → return -1\n- Array size = 2\n  If elements different → smaller one is answer\n  If same → -1\n\n6. TRACE EXAMPLE:\narr = [12, 35, 1, 10, 34, 1]\nStart: largest=-1, second=-1\n12 → largest=12\n35 → second=12, largest=35\n1 → ignored\n10 → second=12 (since 10 < 12)\n34 → second=34 (since 34 < 35 and > 12)\n1 → ignored\nResult = 34\n\n7. INTERVIEW INSIGHT:\nWhenever problem asks for:\n- Largest / Second largest\n- Minimum / Second minimum\nThink \"two variable tracking\" instead of sorting.\n\nThis problem tests understanding of:\n- Careful condition ordering\n- Distinct element handling\n- One-pass optimization thinking\n- Edge case reasoning\n\nIt is a foundational array traversal problem."
 }
-
 
 
 
